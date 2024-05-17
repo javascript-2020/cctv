@@ -1,0 +1,37 @@
+<html>
+    <head style="display: block;">
+        <script style="display: block;" src="https://unpkg.com/ml5@latest/dist/ml5.min.js">
+        </script>
+        <script style="display: block;" src="index.js">
+        </script>
+    </head>
+    <body style="font-family: arial; display: flex; flex-direction: column; height: calc(100% - 40px); margin: 20px; overflow: hidden;">
+        <h3 style="margin: 0px 0px 20px; text-align: center;">
+loading model, please wait ...
+        </h3>
+        <div style="display: flex;">
+            <input style="cursor: pointer; font-size: 16px; box-sizing: border-box; padding: 5px; flex: 1 1 0%;" type="button" value="start">
+            </input>
+        </div>
+        <video style="border: 1px solid lightgray; padding: 5px; box-sizing: border-box; width: 312px; margin: 10px auto;" controls="">
+        </video>
+        <div id="progress" style="height: 25px; border: 1px solid lightgray; padding: 3px;">
+            <div id="bar" style="height: 100%; width: 0px; background-color: rgb(231, 238, 241);">
+            </div>
+        </div>
+        <div id="time" style="text-align: center; margin-top: 5px;">
+        </div>
+        <div id="results" style="margin-top: 10px; flex: 1 1 0%; overflow: auto; border: 1px solid lightgray; padding: 5px; box-sizing: border-box;">
+            <div id="item" style="display: flex; gap: 10px; margin-bottom: 10px; align-items: center;">
+                <div id="type" style="width: 100px;">
+                </div>
+                <div id="confidence" style="width: 60px;">
+                </div>
+                <div id="time" style="width: 80px;">
+                </div>
+                <input style="cursor: pointer; font-size: 16px; box-sizing: border-box;" type="button" value="view">
+                </input>
+            </div>
+        </div>
+    </body>
+</html>
