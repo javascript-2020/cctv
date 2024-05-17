@@ -1,0 +1,127 @@
+
+<!-- serverless.html -->
+
+<html style="height:100%">
+    <head>
+        <script src="https://unpkg.com/ml5@latest/dist/ml5.min.js"></script>
+        <script>
+        
+        var detector;
+        var process       = true;
+        var abort         = false;
+        var step          = 1;
+        var btn;
+        var video;
+        var dur;
+        var bar;
+        var time;
+        var results;
+        var item;
+        
+        window.onload=async function(){
+              $('#file').onclick            = select_file;
+              btn                           = $('[value=start]')
+              btn.onclick                   = click;
+              video                         = $('video');
+              video.onloadedmetadata        = e=>dur   = video.duration;
+              video.onseeked                = seeked;
+              bar                           = $('#bar');
+              time                          = $('#time');
+              results                       = $('#results');
+              item                          = $('#item');
+              item.remove();
+              detector                      = await ml5.objectDetector('cocossd');
+              $('h3').remove();
+        }//onload
+        
+        function select_file(){
+              var input         = document.createElement('input');
+              input.type        = 'file';
+              input.click();
+              input.onchange    = ()=>{
+                    bar.style.width   = 0;
+                    results.replaceChildren();
+                    var url     = window.URL.createObjectURL(input.files[0]);
+                    video.src   = url;
+              }//onchange
+        }//select_file
+        
+        function click(e){
+              if(btn.value=='start'){
+                    btn.value           = 'stop';
+                    process             = true;
+                    abort               = false;
+                    video.currentTime   = 0;
+                    results.replaceChildren();
+              }else{
+                    btn.value   = 'start';
+                    abort       = true;
+              }
+        }//click
+        
+        function seeked(e){
+              var t                 = video.currentTime;
+              bar.style.width       = t/dur*100+'%';
+              time.textContent      = t+' / '+dur;
+              if(abort)return;
+              if(!process)return;
+              detector.detect(video,ondetected);
+        }//onseeked
+        
+        function ondetected(error,detections){
+              if(error)return console.error(error);
+              detections.forEach(detection=>{
+                    if(detection.label!='person')return;
+                    var time                              = video.currentTime;
+                    var nitem                             = item.cloneNode(true);
+                    $(nitem,'#type').textContent          = detection.label;
+                    $(nitem,'#confidence').textContent    = detection.confidence.toFixed(2);
+                    $(nitem,'#time').textContent          = time;
+                    $(nitem,'[value=view]').onclick       = e=>video.currentTime    = time;
+                    results.append(nitem);
+              });
+              next();
+        }//onDetected
+        
+        function next(){
+              var t   = video.currentTime;
+              if(t>=dur){
+                    btn.value   = 'start';
+                    process     = false;
+                    return;
+              }
+              video.currentTime   = t+step;
+        }//next
+        
+        function $(root,sel){
+              if(!sel){
+                    sel     = root;
+                    root    = document;
+              }
+              return root.querySelector(sel);
+        }//$
+        </script>
+    </head>
+    <body style="font-family: arial; height: calc(100% - 40px); margin: 20px;">
+        <div id="center" style="height: 100%; width: 300px; margin: auto; display: flex; flex-direction: column;  overflow: hidden;">
+            <h3 style="margin: 0px 0px 20px; text-align: center;">loading model, please wait ...</h3>
+            <div style="display: flex;">
+                <input style="cursor: pointer; font-size: 16px; box-sizing: border-box; padding: 5px; margin-right: 5px;" type="button" value="file" id="file">
+                <input style="cursor: pointer; font-size: 16px; box-sizing: border-box; padding: 5px; flex: 1 1 0%;" type="button" value="start">
+            </div>
+            <video style="border: 1px solid lightgray; padding: 5px; box-sizing: border-box; width: 300px; margin: 10px auto;" controls=""></video>
+            <div id="progress" style="height: 25px; border: 1px solid lightgray; padding: 3px;">
+                <div id="bar" style="height: 100%; width: 0px; background-color: rgb(231, 238, 241);"></div>
+            </div>
+            <div id="time" style="text-align: center; margin-top: 5px;"></div>
+            <div id="results" style="margin-top: 10px; flex: 1 1 0%; overflow: auto; border: 1px solid lightgray; padding: 5px; box-sizing: border-box;">
+                <div id="item" style="display: flex; gap: 10px; margin-bottom: 10px; align-items: center;">
+                    <div id="type" style="width: 100px;"></div>
+                    <div id="confidence" style="width: 60px;"></div>
+                    <div id="time" style="width: 80px;"></div>
+                    <input style="cursor: pointer; font-size: 16px; box-sizing: border-box;" type="button" value="view">
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
