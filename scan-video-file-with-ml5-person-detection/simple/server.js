@@ -1,7 +1,7 @@
 
 
 
-        var file    = 'd:/cctv/VID_20240514_125654.mp4';
+        var file    = 'video.mp4';
         var port    = 4010;
         
         var fs      = require('fs');
